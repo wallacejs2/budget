@@ -1,0 +1,5 @@
+{
+  "name": "BudgetFlow",
+  "description": "A clean, AI-styled personal budgeting application with local storage persistence.",
+  "requestFramePermissions": []
+}
