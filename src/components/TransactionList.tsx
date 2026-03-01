@@ -1,7 +1,7 @@
 import React from 'react';
 import { Transaction, Category } from '../types';
 import { formatCurrency, formatDate } from '../utils';
-import { ArrowUpRight, ArrowDownLeft, Trash2, Tag } from 'lucide-react';
+import { Trash2, Receipt } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface TransactionListProps {
@@ -20,83 +20,74 @@ export function TransactionList({ transactions, categories, onDeleteTransaction 
 
   if (transactions.length === 0) {
     return (
-      <div className="text-center py-12 bg-zinc-900/30 rounded-2xl border border-zinc-800/50 border-dashed">
-        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-zinc-800/50 mb-4">
-          <Tag className="w-5 h-5 text-zinc-500" />
+      <div>
+        <h3 className="text-sm font-medium text-gray-500 mb-2 px-1">Recent Activity</h3>
+        <div className="bg-white rounded-2xl shadow-sm text-center py-16 px-6">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-gray-100 mb-4">
+            <Receipt className="w-6 h-6 text-gray-400" />
+          </div>
+          <h3 className="text-base font-medium text-gray-900">No transactions yet</h3>
+          <p className="text-sm text-gray-500 mt-1">Add a transaction to get started</p>
         </div>
-        <h3 className="text-zinc-400 font-medium">No transactions yet</h3>
-        <p className="text-zinc-600 text-sm mt-1">Add a transaction to get started</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <h3 className="text-base font-semibold text-zinc-100 flex items-center gap-2">
-        Recent Activity
-        <span className="text-[10px] font-normal text-zinc-500 bg-zinc-900 px-1.5 py-0.5 rounded-full border border-zinc-800">
-          {transactions.length}
-        </span>
-      </h3>
-      
-      <div className="space-y-2">
+    <div>
+      <div className="flex items-center justify-between mb-2 px-1">
+        <h3 className="text-sm font-medium text-gray-500">Recent Activity</h3>
+        <span className="text-sm text-gray-400">{transactions.length} transactions</span>
+      </div>
+
+      <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <AnimatePresence initial={false}>
-          {transactions.map((transaction) => {
+          {transactions.map((transaction, index) => {
             const category = categories.find(c => c.id === transaction.categoryId);
             const subCategoryName = getSubCategoryName(transaction.categoryId, transaction.subCategoryId);
-            
+
             return (
               <motion.div
                 key={transaction.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                className="group relative bg-zinc-900/50 hover:bg-zinc-900 border border-zinc-800/50 hover:border-zinc-700 rounded-xl p-3 transition-all duration-200"
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                className="overflow-hidden"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                      transaction.type === 'income' 
-                        ? 'bg-emerald-500/10 text-emerald-400' 
-                        : 'bg-rose-500/10 text-rose-400'
-                    }`}>
-                      {transaction.type === 'income' ? <ArrowDownLeft className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
-                    </div>
-                    
-                    <div className="min-w-0">
-                      <p className="font-medium text-zinc-200 text-sm truncate">{transaction.description}</p>
-                      <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
-                        <span className="text-[10px] text-zinc-500 font-mono shrink-0">{formatDate(transaction.date)}</span>
-                        <span className="w-0.5 h-0.5 rounded-full bg-zinc-700 shrink-0" />
-                        <span 
-                          className="text-[10px] px-1.5 py-0.5 rounded-md bg-zinc-800 text-zinc-400 border border-zinc-700/50 truncate max-w-[100px]"
-                          style={{ color: category?.color }}
-                        >
-                          {category?.name}
-                        </span>
-                        {subCategoryName && (
-                          <>
-                            <span className="text-zinc-600 text-[8px]">&gt;</span>
-                            <span className="text-[10px] text-zinc-500 truncate max-w-[80px]">{subCategoryName}</span>
-                          </>
-                        )}
-                      </div>
+                <div className={`group flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 transition-colors ${
+                  index < transactions.length - 1 ? 'border-b border-gray-100' : ''
+                }`}>
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
+                    <div
+                      className="w-3 h-3 rounded-full shrink-0"
+                      style={{ backgroundColor: category?.color || '#8E8E93' }}
+                    />
+
+                    <div className="min-w-0 flex-1">
+                      <p className="text-base text-gray-900 truncate">{transaction.description}</p>
+                      <p className="text-sm text-gray-500 mt-0.5">
+                        {formatDate(transaction.date)}
+                        {' · '}
+                        {category?.name}
+                        {subCategoryName && ` · ${subCategoryName}`}
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 pl-2">
-                    <span className={`font-mono font-medium text-base whitespace-nowrap ${
-                      transaction.type === 'income' ? 'text-emerald-400' : 'text-zinc-100'
+                  <div className="flex items-center gap-3 pl-3 shrink-0">
+                    <span className={`text-base font-semibold ${
+                      transaction.type === 'income' ? 'text-[#34C759]' : 'text-gray-900'
                     }`}>
                       {transaction.type === 'income' ? '+' : '-'}{formatCurrency(transaction.amount)}
                     </span>
-                    
+
                     <button
                       onClick={() => onDeleteTransaction(transaction.id)}
-                      className="opacity-100 md:opacity-0 group-hover:opacity-100 p-1.5 text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-all"
+                      className="opacity-100 md:opacity-0 group-hover:opacity-100 w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-lg transition-all"
                       title="Delete transaction"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
                 </div>

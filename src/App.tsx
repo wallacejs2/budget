@@ -12,16 +12,16 @@ import { BudgetOverview } from './components/BudgetOverview';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { DEFAULT_CATEGORIES } from './constants';
 import { Transaction, Category, Budget } from './types';
-import { getMonthKey } from './utils';
-import { Plus, Settings, ChevronLeft, ChevronRight, PieChart } from 'lucide-react';
-import { motion, AnimatePresence } from 'motion/react';
+import { getMonthKey, formatCurrency } from './utils';
+import { Plus, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { AnimatePresence } from 'motion/react';
 
 export default function App() {
   // State
   const [transactions, setTransactions] = useLocalStorage<Transaction[]>('budgetflow_transactions', []);
   const [categories, setCategories] = useLocalStorage<Category[]>('budgetflow_categories', DEFAULT_CATEGORIES);
   const [budgets, setBudgets] = useLocalStorage<Record<string, number>>('budgetflow_budgets', {});
-  
+
   const [currentMonth, setCurrentMonth] = useState(getMonthKey(new Date()));
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
   const [isCategoryManagerOpen, setIsCategoryManagerOpen] = useState(false);
@@ -71,44 +71,41 @@ export default function App() {
       {/* Header */}
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-xl font-bold text-zinc-100 flex items-center gap-2">
-            <PieChart className="w-6 h-6 text-indigo-500" />
-            BudgetFlow
-          </h1>
-          <p className="text-zinc-500 text-xs mt-0.5">Smart financial tracking</p>
+          <h1 className="text-2xl font-bold text-gray-900">BudgetFlow</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Smart financial tracking</p>
         </div>
 
-        <div className="flex items-center gap-3 bg-zinc-900/50 p-1 rounded-xl border border-zinc-800/50 backdrop-blur-sm">
-          <button 
+        <div className="flex items-center gap-2 bg-white/80 backdrop-blur-xl rounded-xl shadow-sm p-1">
+          <button
             onClick={() => changeMonth(-1)}
-            className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-100 transition-colors"
+            className="w-11 h-11 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <span className="font-mono font-medium text-zinc-200 text-sm min-w-[120px] text-center">
+          <span className="font-semibold text-gray-900 text-base min-w-[160px] text-center">
             {formatMonthDisplay(currentMonth)}
           </span>
-          <button 
+          <button
             onClick={() => changeMonth(1)}
-            className="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-100 transition-colors"
+            className="w-11 h-11 flex items-center justify-center hover:bg-gray-100 rounded-lg text-gray-400 hover:text-gray-600 transition-colors"
           >
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
 
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsCategoryManagerOpen(true)}
-            className="p-2 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 rounded-lg transition-colors"
+            className="w-11 h-11 flex items-center justify-center text-[#007AFF] hover:bg-[#007AFF]/10 rounded-xl transition-colors"
             title="Manage Categories"
           >
             <Settings className="w-5 h-5" />
           </button>
           <button
             onClick={() => setIsTransactionModalOpen(true)}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 shadow-lg shadow-indigo-900/20"
+            className="bg-[#007AFF] hover:bg-[#0066D6] text-white px-5 py-2.5 rounded-full text-base font-semibold transition-colors flex items-center gap-2 shadow-sm"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-5 h-5" />
             Add Transaction
           </button>
         </div>
@@ -123,7 +120,7 @@ export default function App() {
           currentMonth={currentMonth}
         />
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2">
             <TransactionList
               transactions={filteredTransactions}
@@ -131,12 +128,12 @@ export default function App() {
               onDeleteTransaction={handleDeleteTransaction}
             />
           </div>
-          
-          <div className="space-y-6">
-            {/* Quick Stats / Side Panel */}
-            <div className="bg-zinc-900/50 border border-zinc-800/50 rounded-xl p-4">
-              <h3 className="text-xs font-medium text-zinc-400 uppercase tracking-wider mb-3">Top Spending Categories</h3>
-              <div className="space-y-3">
+
+          <div className="space-y-5">
+            {/* Top Spending Categories */}
+            <div className="bg-white rounded-2xl shadow-sm p-5">
+              <h3 className="text-sm font-medium text-gray-500 mb-4">Top Spending</h3>
+              <div className="space-y-4">
                 {(Object.entries(
                   filteredTransactions
                     .filter(t => t.type === 'expense')
@@ -153,19 +150,19 @@ export default function App() {
                       .filter(t => t.type === 'expense')
                       .reduce((sum, t) => sum + t.amount, 0);
                     const percentage = totalExpense > 0 ? (amount / totalExpense) * 100 : 0;
-                    
+
                     return (
-                      <div key={catId} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="text-zinc-300">{category?.name || 'Unknown'}</span>
-                          <span className="font-mono text-zinc-400">${amount.toFixed(2)}</span>
+                      <div key={catId} className="space-y-1.5">
+                        <div className="flex justify-between text-base">
+                          <span className="text-gray-900">{category?.name || 'Unknown'}</span>
+                          <span className="text-gray-500">{formatCurrency(amount)}</span>
                         </div>
-                        <div className="h-1.5 bg-zinc-800 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full rounded-full"
-                            style={{ 
+                        <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-500"
+                            style={{
                               width: `${percentage}%`,
-                              backgroundColor: category?.color || '#71717a'
+                              backgroundColor: category?.color || '#8E8E93'
                             }}
                           />
                         </div>
@@ -173,7 +170,7 @@ export default function App() {
                     );
                   })}
                   {filteredTransactions.filter(t => t.type === 'expense').length === 0 && (
-                    <p className="text-zinc-600 text-sm italic">No expenses yet this month.</p>
+                    <p className="text-base text-gray-400 italic">No expenses yet this month.</p>
                   )}
               </div>
             </div>
@@ -202,4 +199,3 @@ export default function App() {
     </Layout>
   );
 }
-
