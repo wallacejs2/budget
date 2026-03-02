@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+html {
+  font-size: 75%;
+}
+
 :root {
   --apple-blue: #007AFF;
   --apple-red: #FF3B30;
