@@ -11,9 +11,9 @@ interface CategoryManagerProps {
 }
 
 const COLORS = [
-  '#ef4444', '#f97316', '#f59e0b', '#eab308', '#84cc16', '#22c55e', 
-  '#10b981', '#14b8a6', '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1', 
-  '#8b5cf6', '#a855f7', '#d946ef', '#ec4899', '#f43f5e', '#71717a'
+  '#FF6B6B', '#FF9F43', '#FECA57', '#48DBFB', '#0ABDE3',
+  '#10AC84', '#2ED573', '#5F27CD', '#A29BFE', '#E056A0',
+  '#F368E0', '#FF6348', '#3B82F6', '#007AFF', '#8E8E93'
 ];
 
 export function CategoryManager({ categories, onUpdateCategories, isOpen, onClose }: CategoryManagerProps) {
@@ -25,7 +25,7 @@ export function CategoryManager({ categories, onUpdateCategories, isOpen, onClos
 
   const handleAddCategory = () => {
     if (!newCategoryName.trim()) return;
-    
+
     const randomColor = COLORS[Math.floor(Math.random() * COLORS.length)];
 
     const newCategory: Category = {
@@ -85,148 +85,166 @@ export function CategoryManager({ categories, onUpdateCategories, isOpen, onClos
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-      <motion.div 
-        initial={{ scale: 0.95, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.95, opacity: 0 }}
-        className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[80vh] flex flex-col shadow-2xl"
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/30 backdrop-blur-sm"
+      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    >
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", stiffness: 400, damping: 36 }}
+        className="bg-white rounded-t-3xl w-full max-w-2xl max-h-[85vh] flex flex-col shadow-2xl"
       >
-        <div className="flex items-center justify-between p-4 border-b border-zinc-800">
-          <h2 className="text-lg font-semibold text-zinc-100">Manage Categories</h2>
-          <button onClick={onClose} className="p-1.5 hover:bg-zinc-800 rounded-full transition-colors">
-            <X className="w-5 h-5 text-zinc-400" />
-          </button>
+        {/* Drag Handle */}
+        <div className="flex justify-center pt-3 pb-2 shrink-0">
+          <div className="w-10 h-1 bg-gray-300 rounded-full" />
         </div>
 
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 pb-3 shrink-0">
+          <button onClick={onClose} className="text-base text-[#007AFF]">Done</button>
+          <h2 className="text-base font-semibold text-gray-900">Manage Categories</h2>
+          <div className="w-10" />
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 pb-8 space-y-5">
           {/* Add New Category */}
-          <div className="flex flex-col sm:flex-row gap-3 items-end bg-zinc-800/50 p-3 rounded-xl border border-zinc-700/50">
-            <div className="flex-1 space-y-1.5 w-full">
-              <label className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">New Category Name</label>
+          <div className="bg-gray-50 rounded-2xl p-4 space-y-3">
+            <h3 className="text-sm font-medium text-gray-500">New Category</h3>
+            <div className="flex flex-col sm:flex-row gap-3">
               <input
                 type="text"
                 value={newCategoryName}
                 onChange={(e) => setNewCategoryName(e.target.value)}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
-                placeholder="e.g., Travel"
+                className="flex-1 bg-white border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#007AFF]/30 focus:border-[#007AFF] placeholder:text-gray-400"
+                placeholder="Category name"
+                onKeyDown={(e) => e.key === 'Enter' && handleAddCategory()}
               />
-            </div>
-            <div className="w-full sm:w-32 space-y-1.5">
-              <label className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider">Type</label>
               <select
                 value={newCategoryType}
                 onChange={(e) => setNewCategoryType(e.target.value as 'income' | 'expense')}
-                className="w-full bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+                className="bg-white border border-gray-200 rounded-xl px-4 py-3 text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#007AFF]/30 focus:border-[#007AFF] appearance-none sm:w-36"
               >
                 <option value="expense">Expense</option>
                 <option value="income">Income</option>
               </select>
+              <button
+                onClick={handleAddCategory}
+                className="bg-[#007AFF] hover:bg-[#0066D6] text-white px-5 py-3 rounded-xl text-base font-semibold transition-colors flex items-center justify-center gap-2 active:scale-[0.98] transform"
+              >
+                <Plus className="w-5 h-5" /> Add
+              </button>
             </div>
-            <button
-              onClick={handleAddCategory}
-              className="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-500 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
-            >
-              <Plus className="w-4 h-4" /> Add
-            </button>
           </div>
 
-          {/* List Categories */}
-          <div className="space-y-2">
-            {categories.map((category) => (
-              <div key={category.id} className="border border-zinc-800 rounded-xl overflow-hidden bg-zinc-900/50 relative">
-                <div 
-                  className="flex items-center justify-between p-3 hover:bg-zinc-800/50 cursor-pointer transition-colors"
+          {/* Categories List */}
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
+            {categories.map((category, index) => (
+              <div key={category.id}>
+                <div
+                  className={`flex items-center justify-between px-4 py-3.5 hover:bg-gray-50 cursor-pointer transition-colors ${
+                    index < categories.length - 1 ? 'border-b border-gray-100' : ''
+                  }`}
                   onClick={() => setExpandedCategory(expandedCategory === category.id ? null : category.id)}
                 >
                   <div className="flex items-center gap-3 flex-1">
-                    {expandedCategory === category.id ? <ChevronDown className="w-4 h-4 text-zinc-500" /> : <ChevronRight className="w-4 h-4 text-zinc-500" />}
-                    
+                    {expandedCategory === category.id
+                      ? <ChevronDown className="w-4 h-4 text-gray-400" />
+                      : <ChevronRight className="w-4 h-4 text-gray-400" />
+                    }
+
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingColorId(editingColorId === category.id ? null : category.id);
                       }}
-                      className="w-5 h-5 rounded-full border border-zinc-700 hover:scale-110 transition-transform flex items-center justify-center group/color"
-                      style={{ backgroundColor: category.color || '#ccc' }}
+                      className="w-6 h-6 rounded-full border-2 border-white shadow-sm hover:scale-110 transition-transform"
+                      style={{ backgroundColor: category.color || '#8E8E93' }}
                       title="Change Color"
-                    >
-                      <Palette className="w-2.5 h-2.5 text-white opacity-0 group-hover/color:opacity-100 transition-opacity drop-shadow-md" />
-                    </button>
+                    />
 
-                    <span className="font-medium text-zinc-200 text-sm">{category.name}</span>
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${category.type === 'income' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                    <span className="text-base text-gray-900">{category.name}</span>
+                    <span className="text-sm text-gray-500">
                       {category.type}
                     </span>
                   </div>
-                  <button 
+                  <button
                     onClick={(e) => { e.stopPropagation(); handleDeleteCategory(category.id); }}
-                    className="text-zinc-500 hover:text-rose-400 transition-colors p-1 ml-2"
+                    className="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[#FF3B30] hover:bg-[#FF3B30]/10 rounded-lg transition-colors"
                   >
                     <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                {/* Color Picker Popover */}
+                {/* Color Picker */}
                 <AnimatePresence>
                   {editingColorId === category.id && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="bg-zinc-950 border-y border-zinc-800 overflow-hidden"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      className="overflow-hidden"
                     >
-                      <div className="p-3 grid grid-cols-9 gap-2">
-                        {COLORS.map((color) => (
-                          <button
-                            key={color}
-                            onClick={() => handleUpdateColor(category.id, color)}
-                            className={`w-6 h-6 rounded-full border transition-transform hover:scale-110 ${category.color === color ? 'border-white scale-110 ring-2 ring-white/20' : 'border-transparent'}`}
-                            style={{ backgroundColor: color }}
-                            title={color}
-                          />
-                        ))}
+                      <div className="px-4 py-3 bg-gray-50 border-y border-gray-100">
+                        <div className="flex flex-wrap gap-2">
+                          {COLORS.map((color) => (
+                            <button
+                              key={color}
+                              onClick={() => handleUpdateColor(category.id, color)}
+                              className={`w-7 h-7 rounded-full transition-transform hover:scale-110 ${
+                                category.color === color ? 'ring-2 ring-[#007AFF] ring-offset-2 scale-110' : ''
+                              }`}
+                              style={{ backgroundColor: color }}
+                            />
+                          ))}
+                        </div>
                       </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
 
+                {/* Subcategories */}
                 <AnimatePresence>
                   {expandedCategory === category.id && (
                     <motion.div
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      className="bg-zinc-950/30 border-t border-zinc-800"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      className="overflow-hidden"
                     >
-                      <div className="p-3 pl-10 space-y-2">
-                        {category.subCategories.map((sub) => (
-                          <div key={sub.id} className="flex items-center justify-between group">
-                            <span className="text-xs text-zinc-400">{sub.name}</span>
-                            <button 
-                              onClick={() => handleDeleteSubCategory(category.id, sub.id)}
-                              className="text-zinc-600 hover:text-rose-400 opacity-100 sm:opacity-0 group-hover:opacity-100 transition-opacity"
+                      <div className="bg-gray-50 border-t border-gray-100 px-4 py-3 pl-12">
+                        <div className="space-y-2">
+                          {category.subCategories.map((sub) => (
+                            <div key={sub.id} className="flex items-center justify-between group py-1">
+                              <span className="text-sm text-gray-600">{sub.name}</span>
+                              <button
+                                onClick={() => handleDeleteSubCategory(category.id, sub.id)}
+                                className="w-8 h-8 flex items-center justify-center text-gray-400 opacity-100 sm:opacity-0 group-hover:opacity-100 hover:text-[#FF3B30] rounded-lg transition-all"
+                              >
+                                <X className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          ))}
+
+                          <div className="flex gap-2 pt-2 border-t border-gray-200">
+                            <input
+                              type="text"
+                              value={newSubCategoryName}
+                              onChange={(e) => setNewSubCategoryName(e.target.value)}
+                              placeholder="New sub-category..."
+                              className="flex-1 bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#007AFF]/30 focus:border-[#007AFF] placeholder:text-gray-400"
+                              onKeyDown={(e) => e.key === 'Enter' && handleAddSubCategory(category.id)}
+                            />
+                            <button
+                              onClick={() => handleAddSubCategory(category.id)}
+                              className="w-9 h-9 flex items-center justify-center text-[#007AFF] hover:bg-[#007AFF]/10 rounded-lg transition-colors"
                             >
-                              <X className="w-3 h-3" />
+                              <Plus className="w-5 h-5" />
                             </button>
                           </div>
-                        ))}
-                        
-                        <div className="flex gap-2 mt-2 pt-2 border-t border-zinc-800/50">
-                          <input
-                            type="text"
-                            value={newSubCategoryName}
-                            onChange={(e) => setNewSubCategoryName(e.target.value)}
-                            placeholder="New sub-category..."
-                            className="flex-1 bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-xs focus:outline-none focus:border-emerald-500/50"
-                            onKeyDown={(e) => e.key === 'Enter' && handleAddSubCategory(category.id)}
-                          />
-                          <button
-                            onClick={() => handleAddSubCategory(category.id)}
-                            className="text-emerald-500 hover:text-emerald-400 p-1"
-                          >
-                            <Plus className="w-4 h-4" />
-                          </button>
                         </div>
                       </div>
                     </motion.div>

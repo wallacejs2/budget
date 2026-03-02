@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+html {
+  font-size: 75%;
+}
+
+:root {
+  --apple-blue: #007AFF;
+  --apple-red: #FF3B30;
+  --apple-green: #34C759;
+  --apple-orange: #FF9500;
+  --apple-gray: #8E8E93;
+  --apple-separator: rgba(60, 60, 67, 0.12);
+  --apple-bg: #F2F2F7;
+  color-scheme: light;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+  background-color: var(--apple-bg);
+  color: #1c1c1e;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background-color: rgba(0, 122, 255, 0.2);
+}
+
+/* Smooth scrolling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+}
